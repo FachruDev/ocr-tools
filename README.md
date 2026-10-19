@@ -72,16 +72,30 @@ Langkah di aplikasi:
 ## Display digital (seven segment)
 
 Angka di panel meter, timbangan, atau termometer digital tersusun dari batang-batang terpisah,
-sehingga mode biasa sering tidak mendeteksinya sama sekali. Centang **Display digital** (CLI: `--7seg`). Mode ini:
+sehingga mode biasa sering tidak mendeteksinya sama sekali. Centang **Display digital** (CLI: `--7seg`).
+Teks biasa di sekitarnya (label tombol, merek) tetap ikut terbaca. Kode: [ocrtool/sevenseg.py](ocrtool/sevenseg.py).
 
-1. mengambil hanya segmen yang menyala (segmen mati yang tampak samar dibuang),
-2. menyambung celah antar segmen sehingga angka terlihat utuh,
-3. mematikan deteksi teks terbalik (tanpa ini, "1999" bisa terbaca "6661").
+Cara kerjanya bertahap:
 
-Mode ini mencoba beberapa varian (LED terang dan LCD gelap) lalu memilih hasil yang paling meyakinkan,
-jadi bisa sedikit lebih lambat. Batasan: titik desimal yang sangat kecil kadang tidak tertangkap,
-dan tulisan biasa di sekitar display (merek, label) bisa ikut hilang.
-Tips: foto display dari depan, potong (crop) di sekitar angka, dan hindari pantulan cahaya di kaca.
+1. OCR biasa. Angka yang skornya meragukan dibaca ulang.
+2. Deteksi ulang dengan ambang lebih rendah, untuk angka yang segmennya putus-putus.
+3. Pencarian klasik bentuk "batang" (calon segmen) yang dikelompokkan menjadi area angka,
+   untuk angka LCD tipis yang sama sekali tidak terlihat oleh detektor (contoh: suhu di remote AC).
+4. Pencarian kaca/panel display (persegi panjang) yang dibinarisasi secara lokal,
+   untuk angka berongga atau berkontras rendah.
+
+Setiap pembacaan ulang membuang segmen mati yang tampak samar, menyambung celah antar segmen,
+dan mematikan deteksi teks terbalik (tanpa ini, "1999" bisa terbaca "6661").
+
+**Hasil uji** pada 18 foto (14 foto display dari Wikimedia Commons, 2 foto dari pengguna, 2 gambar buatan):
+mode Display digital membaca **77%** angka dengan benar, sedangkan mode biasa 50%. Waktunya ±3–17 detik per foto.
+
+Kasus yang masih gagal:
+- display yang sedang mati (semua segmen tampak "8" samar),
+- angka yang menempel jadi satu kotak (contoh: "2.59 23.5" terbaca "2.5923.5"),
+- jam LCD dengan banyak angka kecil di sekitarnya.
+
+Tips: foto display dari depan, hindari pantulan cahaya di kaca, dan bila perlu potong (crop) foto di sekitar display.
 
 ## Tips agar hasil OCR akurat
 
@@ -109,6 +123,7 @@ ocrtool/
   preprocess.py   buka gambar, perbaiki rotasi EXIF foto HP, atur ukuran, tingkatkan kontras
   engine.py       pembungkus RapidOCR (bisa ditambah engine lain, mis. Tesseract)
   layout.py       luruskan kemiringan, susun kotak teks menjadi baris/paragraf/kolom
+  sevenseg.py     pembaca display digital (seven segment)
   pipeline.py     alur lengkap satu gambar -> PageResult
   exporters.py    txt / docx / pdf searchable / pdf teks / md / json (+ ZIP)
   server.py       API FastAPI + menyajikan UI

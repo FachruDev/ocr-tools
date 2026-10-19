@@ -51,27 +51,6 @@ def to_bgr(img: Image.Image) -> np.ndarray:
     return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
 
 
-def seven_segment_variants(bgr: np.ndarray) -> list[np.ndarray]:
-    """Versi gambar untuk display digital (seven segment), hitam di atas putih.
-
-    Segmen yang menyala dipisahkan dari segmen mati (yang sering tetap terlihat samar),
-    lalu celah antar segmen ditutup agar angka tampak seperti huruf cetak utuh.
-    Dibuat beberapa varian (LED terang / LCD gelap, dua ukuran penyambung) karena
-    tiap display berbeda; pipeline memilih hasil yang paling meyakinkan.
-    """
-    gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-    value = bgr.max(axis=2)  # kanal terang HSV: LED merah/hijau tetap terang di sini
-    base = max(3, round(min(bgr.shape[:2]) / 60))
-    variants = []
-    for source in (value, 255 - gray):  # LED (segmen terang) lalu LCD (segmen gelap)
-        _, segments = cv2.threshold(source, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        for size in (base, round(base * 1.7)):
-            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (size, size))
-            joined = cv2.morphologyEx(segments, cv2.MORPH_CLOSE, kernel)
-            variants.append(cv2.cvtColor(255 - joined, cv2.COLOR_GRAY2BGR))
-    return variants
-
-
 def enhance_contrast(bgr: np.ndarray) -> np.ndarray:
     """CLAHE pada kanal terang: membantu foto gelap, pudar, atau kena bayangan."""
     lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB)

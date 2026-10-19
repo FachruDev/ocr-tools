@@ -7,7 +7,7 @@ import time
 import uuid
 from dataclasses import dataclass
 
-from . import layout, preprocess
+from . import layout, preprocess, sevenseg
 from .engine import TextBox, get_engine
 
 
@@ -46,24 +46,6 @@ class PageResult:
         }
 
 
-def _digit_weight(boxes: list[TextBox]) -> float:
-    return sum(b.score * sum(ch.isdigit() for ch in b.text) for b in boxes)
-
-
-def _read_seven_segment(bgr) -> list[TextBox]:
-    """Coba semua varian preprocessing seven segment, ambil yang menghasilkan angka paling meyakinkan."""
-    engine = get_engine()
-    best: list[TextBox] = []
-    for variant in preprocess.seven_segment_variants(bgr):
-        boxes = engine.recognize(variant, use_cls=False)
-        if _digit_weight(boxes) > _digit_weight(best):
-            best = boxes
-        # Sudah ada angka (min. 2 digit) yang sangat meyakinkan: varian lain tidak perlu dicoba
-        if any(b.score >= 0.95 and sum(ch.isdigit() for ch in b.text) >= 2 for b in best):
-            break
-    return best
-
-
 def process_image(data: bytes, name: str, enhance: bool = False, seven_segment: bool = False) -> PageResult:
     started = time.perf_counter()
     img = preprocess.normalize_size(preprocess.load_image(data))
@@ -71,7 +53,7 @@ def process_image(data: bytes, name: str, enhance: bool = False, seven_segment: 
     if enhance:
         bgr = preprocess.enhance_contrast(bgr)
 
-    boxes = _read_seven_segment(bgr) if seven_segment else get_engine().recognize(bgr)
+    boxes = sevenseg.recognize(bgr) if seven_segment else get_engine().recognize(bgr)
     lines = layout.group_lines(boxes)
 
     buf = io.BytesIO()
