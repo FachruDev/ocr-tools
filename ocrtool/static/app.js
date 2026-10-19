@@ -85,7 +85,8 @@ function addFiles(fileList) {
     return;
   }
   const enhance = $("#optEnhance").checked;
-  for (const file of files) state.queue.push({ file, enhance });
+  const sevenSegment = $("#optSevenSeg").checked;
+  for (const file of files) state.queue.push({ file, enhance, sevenSegment });
   state.total += files.length;
   processQueue();
 }
@@ -118,11 +119,12 @@ async function processQueue() {
   refreshButtons();
 }
 
-async function ocrFile({ file, enhance }) {
+async function ocrFile({ file, enhance, sevenSegment }) {
   const form = new FormData();
   const name = file.name && file.name !== "image.png" ? file.name : `tempel_${Date.now()}.png`;
   form.append("file", file, name);
   form.append("enhance", enhance ? "true" : "false");
+  form.append("seven_segment", sevenSegment ? "true" : "false");
   if (state.jobId) form.append("job_id", state.jobId);
   const res = await fetch("/api/ocr", { method: "POST", body: form });
   const data = await res.json().catch(() => ({}));

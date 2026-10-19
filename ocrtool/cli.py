@@ -41,6 +41,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="gabungkan semua gambar jadi satu file per format")
     parser.add_argument("--kontras", "--enhance", dest="enhance", action="store_true",
                         help="tingkatkan kontras (foto gelap/pudar)")
+    parser.add_argument("--7seg", "--seven-segment", dest="seven_segment", action="store_true",
+                        help="mode display digital / seven segment (panel meter, timbangan, dll)")
     parser.add_argument("-r", "--recursive", action="store_true", help="ikut proses subfolder")
     args = parser.parse_args(argv)
 
@@ -55,7 +57,8 @@ def main(argv: list[str] | None = None) -> int:
     pages = []
     for index, path in enumerate(files, 1):
         try:
-            page = process_image(path.read_bytes(), path.name, enhance=args.enhance)
+            page = process_image(path.read_bytes(), path.name, enhance=args.enhance,
+                                 seven_segment=args.seven_segment)
         except Exception as exc:  # satu file rusak tidak menghentikan yang lain
             print(f"  [{index}/{len(files)}] {path.name}: GAGAL - {exc}", file=sys.stderr)
             continue

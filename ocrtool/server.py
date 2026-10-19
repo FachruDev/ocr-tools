@@ -109,13 +109,14 @@ def status() -> dict:
 def ocr(
     file: UploadFile = File(...),
     enhance: bool = Form(False),
+    seven_segment: bool = Form(False),
     job_id: str | None = Form(None),
 ) -> dict:
     data = file.file.read(MAX_UPLOAD_MB * 1024 * 1024 + 1)
     if len(data) > MAX_UPLOAD_MB * 1024 * 1024:
         raise HTTPException(413, f"File terlalu besar (maks {MAX_UPLOAD_MB} MB).")
     try:
-        page = process_image(data, file.filename or "gambar.png", enhance=enhance)
+        page = process_image(data, file.filename or "gambar.png", enhance=enhance, seven_segment=seven_segment)
     except UnidentifiedImageError:
         raise HTTPException(400, "File bukan gambar atau formatnya tidak didukung.")
     job_id = store.add(job_id, page)

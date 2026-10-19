@@ -39,7 +39,7 @@ class RapidOCREngine:
         from rapidocr import RapidOCR
 
         self._ocr = RapidOCR(params={
-            "Global.log_level": "warning",
+            "Global.log_level": "error",
             "Global.text_score": text_score,
             "EngineConfig.onnxruntime.intra_op_num_threads": default_threads(),
         })
@@ -55,9 +55,10 @@ class RapidOCREngine:
         cv2.putText(dummy, "Warm up 123", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 3)
         self._ocr(dummy)
 
-    def recognize(self, bgr: np.ndarray) -> list[TextBox]:
+    def recognize(self, bgr: np.ndarray, use_cls: bool = True) -> list[TextBox]:
+        """use_cls=False mematikan deteksi teks terbalik (perlu untuk seven segment: 1999 bisa terbaca 6661)."""
         with self._lock:
-            out = self._ocr(bgr)
+            out = self._ocr(bgr, use_cls=use_cls)
         if out.boxes is None or out.txts is None:
             return []
         return [

@@ -56,6 +56,7 @@ Langkah di aplikasi:
 | `--layout` | pertahankan tata letak kolom/tabel |
 | `--gabung` | gabungkan semua gambar jadi satu file |
 | `--kontras` | tingkatkan kontras untuk foto gelap/pudar |
+| `--7seg` | mode display digital / seven segment |
 | `-r` | ikut memproses subfolder |
 
 ## Format output
@@ -67,6 +68,20 @@ Langkah di aplikasi:
 | PDF teks | Hanya teks hasil OCR (termasuk hasil edit) |
 | TXT / Markdown | Teks polos |
 | JSON | Teks, skor keyakinan, dan koordinat setiap kotak (untuk developer) |
+
+## Display digital (seven segment)
+
+Angka di panel meter, timbangan, atau termometer digital tersusun dari batang-batang terpisah,
+sehingga mode biasa sering tidak mendeteksinya sama sekali. Centang **Display digital** (CLI: `--7seg`). Mode ini:
+
+1. mengambil hanya segmen yang menyala (segmen mati yang tampak samar dibuang),
+2. menyambung celah antar segmen sehingga angka terlihat utuh,
+3. mematikan deteksi teks terbalik (tanpa ini, "1999" bisa terbaca "6661").
+
+Mode ini mencoba beberapa varian (LED terang dan LCD gelap) lalu memilih hasil yang paling meyakinkan,
+jadi bisa sedikit lebih lambat. Batasan: titik desimal yang sangat kecil kadang tidak tertangkap,
+dan tulisan biasa di sekitar display (merek, label) bisa ikut hilang.
+Tips: foto display dari depan, potong (crop) di sekitar angka, dan hindari pantulan cahaya di kaca.
 
 ## Tips agar hasil OCR akurat
 
