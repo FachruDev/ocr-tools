@@ -1,0 +1,19 @@
+# Engine OCR (model sudah termasuk di paket, berjalan offline)
+rapidocr>=3.10
+onnxruntime>=1.31      # ganti dengan onnxruntime-gpu di server ber-GPU NVIDIA
+
+# Pengolahan gambar
+opencv-python-headless>=4.10
+pillow>=11
+pillow-heif>=1.0       # opsional: foto .heic dari iPhone
+numpy>=2
+
+# Export
+python-docx>=1.1
+reportlab>=4.2
+
+# Web + desktop
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+pywebview>=5.3         # hanya untuk mode desktop

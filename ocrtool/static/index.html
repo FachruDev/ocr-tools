@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OCR Tools</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230f766e'/><text x='16' y='22' font-size='15' font-family='Arial' font-weight='700' fill='white' text-anchor='middle'>Aa</text></svg>">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">Aa</span>
+      <div>
+        <h1>OCR Tools</h1>
+        <p>Gambar → teks · offline · gratis</p>
+      </div>
+    </div>
+    <div class="engine" id="engineStatus"><span class="dot"></span><span>Memuat engine…</span></div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel">
+      <section>
+        <h2><span>1</span> Tambah gambar</h2>
+        <label class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept="image/*,.heic,.heif" multiple hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <strong>Seret foto ke sini</strong>
+          <span>atau klik untuk memilih · bisa banyak sekaligus<br>Ctrl+V untuk menempel screenshot</span>
+        </label>
+        <label class="check"><input type="checkbox" id="optEnhance"> Tingkatkan kontras <small>foto gelap / pudar</small></label>
+        <div class="progress" id="progress" hidden>
+          <div class="track"><div class="bar" id="progressBar"></div></div>
+          <span id="progressText"></span>
+        </div>
+      </section>
+
+      <section>
+        <h2><span>2</span> Tampilan teks</h2>
+        <div class="segmented" role="radiogroup">
+          <input type="radio" name="mode" id="modePlain" value="plain" checked><label for="modePlain">Teks saja</label>
+          <input type="radio" name="mode" id="modeLayout" value="layout"><label for="modeLayout">Tata letak</label>
+        </div>
+        <p class="hint">“Tata letak” menjaga posisi kolom, cocok untuk tabel, nota, dan faktur.</p>
+        <label class="check"><input type="checkbox" id="optBoxes" checked> Tampilkan kotak deteksi</label>
+      </section>
+
+      <section>
+        <h2><span>3</span> Simpan hasil</h2>
+        <select id="format">
+          <option value="docx">Word (.docx)</option>
+          <option value="txt">Teks (.txt)</option>
+          <option value="pdf">PDF searchable (gambar + teks)</option>
+          <option value="pdf_text">PDF teks saja</option>
+          <option value="md">Markdown (.md)</option>
+          <option value="json">JSON (teks + posisi kotak)</option>
+        </select>
+        <p class="hint" id="formatHint"></p>
+        <label class="check"><input type="checkbox" id="optCombine" checked> Gabungkan semua jadi satu file</label>
+        <button class="primary" id="btnExport" disabled>Download</button>
+        <div class="row">
+          <button id="btnCopyAll" disabled>Salin semua</button>
+          <button id="btnClear" disabled>Hapus semua</button>
+        </div>
+      </section>
+    </aside>
+
+    <section class="results" id="results">
+      <div class="empty" id="empty">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="9" width="34" height="30" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 19h20M14 25h14M14 31h17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <p>Belum ada gambar.</p>
+        <small>Hasil OCR akan muncul di sini dan teksnya bisa langsung diperbaiki sebelum disimpan.</small>
+      </div>
+    </section>
+  </main>
+
+  <template id="cardTpl">
+    <article class="card">
+      <header>
+        <div>
+          <h3 class="name"></h3>
+          <p class="meta"></p>
+        </div>
+        <div class="actions">
+          <button class="ghost btn-copy" title="Salin teks">Salin</button>
+          <button class="ghost btn-remove" title="Hapus dari daftar">Hapus</button>
+        </div>
+      </header>
+      <div class="body">
+        <div class="preview">
+          <div class="frame">
+            <img alt="">
+            <svg class="boxes" preserveAspectRatio="none"></svg>
+          </div>
+        </div>
+        <textarea spellcheck="false"></textarea>
+      </div>
+    </article>
+  </template>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
